@@ -1,19 +1,29 @@
 import express from "express";
-import multer from "multer";
 import path from 'path';
 import fs from "fs";
 import fse from 'fs-extra';
 import webpush from "web-push";
-import cors from 'cors';
+import cors from "cors";
+import multer from "multer";
+import {
+    ref,
+    uploadBytes,
+    listAll,
+    deleteObject,
+} from "firebase/storage";
+import storage from "./db.js";
 
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-const upload = path.join(__dirname, "public", "uploads");
+const uploadPath = path.join(__dirname, "public", "uploads");
 const subscription = 'subscriptions.json';
 let subscriptions = [];
+
+const memoStorage = multer.memoryStorage();
+const upload = multer({ memoStorage });
 
 const httpPort = 8080
 
@@ -33,7 +43,7 @@ app.get('/', function (req, res) {
 var uploadSnaps = multer({
     storage: multer.diskStorage({
         destination: function (req, file, cb) {
-            cb(null, upload);
+            cb(null, uploadPath);
         },
         filename: function (req, file, cb) {
             let fn = file.originalname.replaceAll(":", "-");
@@ -76,8 +86,20 @@ app.post("/images", function (req, res) {
     });
 });
 
+app.post("/addPicture", upload.single("image"), async (req, res) => {
+    const file = req.file;
+    console.log(file)
+    const imageRef = ref(storage, file.originalname);
+    const metatype = { contentType: file.mimetype, name: file.originalname };
+    await uploadBytes(imageRef, file.buffer)
+        .then((snapshot) => {
+            res.send("uploaded!");
+        })
+        .catch((error) => console.log(error.message));
+});
+
 app.get("/snaps", function (req, res) {
-    let files = fse.readdirSync(upload);
+    let files = fse.readdirSync(uploadPath);
     files = files.reverse().slice(0, 10);
     res.json({
         files

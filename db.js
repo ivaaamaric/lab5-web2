@@ -1,7 +1,7 @@
 import { initializeApp } from "firebase/app";
-import "firebase/storage";
-// import admin from "firebase-admin";
+import { getStorage } from "firebase/storage";
 
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
     apiKey: "AIzaSyAHO3yBb3RDIcekCat1rfE67LS3ft0ueHk",
     authDomain: "pwa-lab5.firebaseapp.com",
@@ -11,13 +11,7 @@ const firebaseConfig = {
     appId: "1:757024483152:web:305d90b3b6ea47bf04ee55"
 };
 
-// var serviceAccount = require("./certs/pwa-lab5-firebase-adminsdk-ebpgm-8d19c5df7c.json");
+const firebaseApp = initializeApp(firebaseConfig);
 
-// admin.initializeApp({
-//     credential: admin.credential.cert(serviceAccount)
-// });
-
-const db = initializeApp(firebaseConfig);
-export {
-    db
-}
+// Get a reference to the storage service, which is used to create references in your storage bucket
+export default getStorage(firebaseApp);
