@@ -63,7 +63,7 @@ let startSync = async function () {
             formData.append("image", snap.image, snap.id + ".png");
             fetch("/images", {
                 method: "POST",
-                body: snap,
+                body: formData,
             })
                 .then(function (res) {
                     if (res.ok) {

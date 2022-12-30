@@ -5,7 +5,6 @@ import fs from "fs";
 import fse from 'fs-extra';
 import webpush from "web-push";
 import cors from 'cors';
-import { Storage } from '@google-cloud/storage';
 
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
@@ -22,10 +21,6 @@ const app = express()
 app.use(express.json());
 app.use(cors());
 app.use(express.static(path.join(__dirname, 'public')))
-
-const storage = new Storage({
-    keyFilename: "./certs/pwa-lab5-firebase-adminsdk-ebpgm-8d19c5df7c.json",
-});
 
 app.listen(httpPort, function () {
     console.log(`Listening on port ${httpPort}!`)
@@ -47,26 +42,7 @@ var uploadSnaps = multer({
     })
 }).single("image");
 
-var uploadImage = async (filename) => {
-    await storage.bucket(bucketName).upload(filename, {
-        // Support for HTTP requests made with `Accept-Encoding: gzip`
-        gzip: true,
-        // By setting the option `destination`, you can change the name of the
-        // object you are uploading to a bucket.
-        metadata: {
-            // Enable long-lived HTTP caching headers
-            // Use only if the contents of the file will never change
-            // (If the contents will change, use cacheControl: 'no-cache')
-            cacheControl: 'public, max-age=31536000',
-        },
-    })
-}
-
 app.post("/images", function (req, res) {
-    uploadImage(req.body.snap)
-        .then(console.log("ok"))
-        .catch(err => console.log(err))
-
     uploadSnaps(req, res, async function (err) {
         if (err) {
             console.log(err);
