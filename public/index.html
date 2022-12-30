@@ -34,11 +34,36 @@
             </button>
         </div>
     </div>
+    <div id="images">
+        <template id="template">
+            <img class="img-fluid" src="tbd" />
+        </template>
+    </div>
     <div id="pictures"></div>
     <script type="module" src="/js/snap.js"></script>
     <script type="module" src="/js/notification.js"></script>
     <script type="module" src="/js/pwa.js"></script>
     <script src="/js/status.js"></script>
+    <script>
+        fetch("/snaps")
+            .then((res) => {
+                if (res.ok) {
+                    res.json().then((data) => {
+                        data.forEach((file) => {
+                            let snapsDiv = document.querySelector("#images");
+                            let template = document.querySelector("#template");
+                            var clone = template.content.cloneNode(true);
+                            let img = clone.querySelector("img");
+                            img.src = file.url;
+                            snapsDiv.appendChild(clone);
+                        });
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    </script>
 
 </body>
 

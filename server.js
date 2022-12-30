@@ -40,29 +40,12 @@ app.get('/', function (req, res) {
     res.sendFile(path.join(__dirname, 'public/index.html'))
 });
 
-var uploadSnaps = multer({
-    storage: multer.diskStorage({
-        destination: function (req, file, cb) {
-            cb(null, uploadPath);
-        },
-        filename: function (req, file, cb) {
-            let fn = file.originalname.replaceAll(":", "-");
-            cb(null, fn);
-        },
-    })
-}).single("image");
-
-app.post("/images", function (req, res) {
-    uploadSnaps(req, res, async function (err) {
-        if (err) {
-            console.log(err);
-            res.json({
-                success: false,
-                error: {
-                    message: 'Upload failed. Check error message in console.'
-                }
-            });
-        } else {
+app.post("/addPicture", upload.single("image"), async (req, res) => {
+    const file = req.file;
+    const imageRef = ref(storage, file.originalname);
+    const metatype = { contentType: file.mimetype, name: file.originalname };
+    await uploadBytes(imageRef, file.buffer)
+        .then((snapshot) => {
             subscriptions.forEach(async sub => {
                 try {
                     webpush.setVapidDetails(
@@ -82,20 +65,41 @@ app.post("/images", function (req, res) {
                 success: true,
                 id: req.body.id
             });
-        }
-    });
+        })
+        .catch((error) => {
+            console.log(error);
+            res.json({
+                success: false,
+                error: {
+                    message: 'Upload failed. Check error message in console.'
+                }
+            });
+        });
 });
 
-app.post("/addPicture", upload.single("image"), async (req, res) => {
-    const file = req.file;
-    console.log(file)
-    const imageRef = ref(storage, file.originalname);
-    const metatype = { contentType: file.mimetype, name: file.originalname };
-    await uploadBytes(imageRef, file.buffer)
-        .then((snapshot) => {
-            res.send("uploaded!");
+app.get("/snaps", async (req, res) => {
+    const listRef = ref(storage);
+    let productPictures = [];
+    await listAll(listRef)
+        .then((pics) => {
+            productPictures = pics.items.map((item) => {
+                const publicUrl = `https://firebasestorage.googleapis.com/v0/b/${item._location.bucket}/o/${item._location.path_}?alt=media`;
+                return {
+                    url: publicUrl,
+                    name: item._location.path_,
+                };
+            });
+            res.send(productPictures);
         })
-        .catch((error) => console.log(error.message));
+        .catch((error) => {
+            console.log(error);
+            res.json({
+                success: false,
+                error: {
+                    message: 'Download failed. Check error message in console.'
+                }
+            });
+        });
 });
 
 app.get("/snaps", function (req, res) {
