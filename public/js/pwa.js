@@ -1,5 +1,3 @@
-import { configurePushSubscription } from "../js/notification.js"
-
 document.addEventListener('DOMContentLoaded', init, false);
 
 function init() {
@@ -8,17 +6,7 @@ function init() {
             type: 'module',
         })
             .then((reg) => {
-                if ("Notification" in window) {
-                    Notification.requestPermission(async function (res) {
-                        if (res !== "granted") {
-                            alert(`Push notifications denied for this site!\nTo test functionality, please allow notifications in browser settings.`);
-                        } else {
-                            await configurePushSubscription();
-                        }
-                    });
-                } else {
-                    alert(`Push notifications not available. Please try another browser.`);
-                }
+                console.log("Service worker is ok")
             }, (err) => {
                 alert('Service worker not registered! Some error occured : ', err);
             });

@@ -59,8 +59,8 @@ let startSync = async function () {
             let snap = entry[1];
             let formData = new FormData();
             formData.append("id", snap.id);
-            formData.append("title", snap.title);
-            formData.append("image", snap.image, snap.id + ".png");
+            formData.append("title", "selfie0" + snap.title);
+            formData.append("image", snap.image, "selfie4" + snap.id + ".png");
             fetch("/addPicture", {
                 method: "POST",
                 body: formData,

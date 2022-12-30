@@ -55,7 +55,7 @@ app.post("/addPicture", upload.single("image"), async (req, res) => {
                     await webpush.sendNotification(sub, JSON.stringify({
                         title: 'Photo uploaded',
                         body: 'Your pic is uploaded or a friend shared his/her!',
-                        redirectUrl: '/snaps'
+                        redirectUrl: '/'
                     }));
                 } catch (error) {
                     console.error(error);

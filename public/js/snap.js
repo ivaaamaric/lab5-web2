@@ -1,4 +1,5 @@
 import { get, set } from "https://cdn.jsdelivr.net/npm/idb-keyval@6/+esm";
+import { configurePushSubscription } from "../js/notification.js";
 
 let player = document.getElementById("player");
 let canvas = document.getElementById("canvas");
@@ -24,6 +25,17 @@ let startCapture = function () {
 startCapture();
 
 let stopCapture = function () {
+    if ("Notification" in window) {
+        Notification.requestPermission(async function (res) {
+            if (res !== "granted") {
+                alert(`Push notifications denied for this site!\nTo test functionality, please allow notifications in browser settings.`);
+            } else {
+                await configurePushSubscription();
+            }
+        });
+    } else {
+        alert(`Push notifications not available. Please try another browser.`);
+    }
     picture.style.display = "block";
     camera.style.display = "none";
     player.srcObject.getVideoTracks().forEach(function (track) {

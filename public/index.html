@@ -2,6 +2,30 @@
 <html lang="en">
 
 <head>
+    <style>
+        img {
+            object-fit: cover;
+            width: 200px;
+            height: 200px;
+        }
+
+        html,
+        body {
+            height: 100%;
+            width: 90%;
+        }
+
+        html {
+            display: table;
+            margin: auto;
+        }
+
+        body {
+            display: table-cell;
+            vertical-align: middle;
+            padding: 15px;
+        }
+    </style>
     <link rel="manifest" href="/js/pwa.webmanifest">
     <link rel="apple-touch-icon" href="/images/apple-touch.png">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -20,21 +44,22 @@
     <hr />
     <div>
         <div id="camera">
-            <video id="player" width="100%" autoplay></video>
-            <button id="snap">
+            <button id="snap" style="width: 100%; margin-bottom: 10px; padding: 10px;">
                 <i class="bi bi-camera"></i>
                 Take a pic
             </button>
+            <video id="player" width="100%" autoplay></video>
         </div>
         <div id="picture" style="display: none">
-            <canvas id="canvas"></canvas>
-            <button id="share">
+            <button id="share" style="width: 100%; margin-bottom: 10px; padding: 10px;">
                 <i class="bi bi-cloud-upload"></i>
                 Share with friends
             </button>
+            <canvas id="canvas" style="width: 100%;"></canvas>
         </div>
     </div>
     <div id="images">
+        <h3>Let's see all new posts:</h3>
         <template id="template">
             <img class="img-fluid" src="tbd" />
         </template>
@@ -49,11 +74,12 @@
             .then((res) => {
                 if (res.ok) {
                     res.json().then((data) => {
-                        data.forEach((file) => {
+                        data.slice().reverse().forEach((file) => {
                             let snapsDiv = document.querySelector("#images");
                             let template = document.querySelector("#template");
                             var clone = template.content.cloneNode(true);
                             let img = clone.querySelector("img");
+                            img.alt = file.name
                             img.src = file.url;
                             snapsDiv.appendChild(clone);
                         });
