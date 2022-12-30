@@ -1,0 +1,17 @@
+{
+  "name": "Progressive Web App Laboratorijska Vjezba 5",
+  "short_name": "pwa",
+  "description": "pwa for lab5",
+  "icons": [
+    {
+      "src": "/../images/splash-screen.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "/",
+  "display": "fullscreen",
+  "theme_color": "#A08679",
+  "background_color": "#D8CBC4",
+  "gcm_sender_id": "757024483152"
+}

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <link rel="manifest" href="/js/pwa.webmanifest">
+    <link rel="apple-touch-icon" href="/images/apple-touch.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#A08679" />
+    <meta charset="UTF-8">
+    <meta name="description" content="web2 lab5">
+    <meta name="keywords" content="pwa">
+    <meta name="author" content="Iva Maric">
+    <title>PWA</title>
+</head>
+
+<body>
+    <h1>Upload a selfie!</h1>
+    <h2>Share your picture with friends and see what they are up to :)</h2>
+    <span>Your current status is:</span> <span><b class="page-status">online</b></span>
+    <hr />
+    <div>
+        <div id="camera">
+            <video id="player" width="100%" autoplay></video>
+            <button id="snap">
+                <i class="bi bi-camera"></i>
+                Take a pic
+            </button>
+        </div>
+        <div id="picture" style="display: none">
+            <canvas id="canvas"></canvas>
+            <button id="share">
+                <i class="bi bi-cloud-upload"></i>
+                Share with friends
+            </button>
+        </div>
+    </div>
+    <div id="pictures"></div>
+    <script type="module" src="/js/snap.js"></script>
+    <script type="module" src="/js/notification.js"></script>
+    <script type="module" src="/js/pwa.js"></script>
+    <script src="/js/status.js"></script>
+
+</body>
+
+</html>
