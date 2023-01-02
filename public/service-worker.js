@@ -10,7 +10,8 @@ const toCache = [
     '/images/splash-screen.png',
     '/js/snap.js',
     '/js/notification.js',
-    '/js/idb-keyval.js'
+    '/js/idb-keyval.js',
+    '/js/db.js'
 ];
 
 self.addEventListener('install', function (event) {
@@ -28,7 +29,14 @@ self.addEventListener('fetch', function (event) {
         fetch(event.request)
             .catch(async () => {
                 const cache = await caches.open(CACHE_NAME);
-                return await cache.match(event.request);
+                return cache.match(event.request)
+                    .then(res => {
+                        if (res) {
+                            return res
+                        } else {
+                            return new Response("Not in cache", { "status": 408, "headers": { "Content-Type": "text/plain" } });
+                        }
+                    });
             })
     )
 });

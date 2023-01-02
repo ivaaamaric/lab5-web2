@@ -1,6 +1,5 @@
 import express from "express";
 import path from 'path';
-import fs from "fs";
 import fse from 'fs-extra';
 import webpush from "web-push";
 import cors from "cors";
@@ -9,9 +8,15 @@ import {
     ref,
     uploadBytes,
     listAll,
-    deleteObject,
 } from "firebase/storage";
-import storage from "./db.js";
+import { storage, database } from "./public/js/db.js";
+import {
+    ref as databaseRef,
+    set,
+    getDatabase,
+    onValue
+} from "firebase/database";
+import { v4 as uuidv4 } from 'uuid';
 
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
@@ -19,7 +24,6 @@ import { dirname } from 'path';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const uploadPath = path.join(__dirname, "public", "uploads");
-const subscription = 'subscriptions.json';
 let subscriptions = [];
 
 const memoStorage = multer.memoryStorage();
@@ -33,12 +37,24 @@ app.use(cors());
 app.use(express.static(path.join(__dirname, 'public')))
 
 app.listen(httpPort, function () {
+    updateSubscriptions();
     console.log(`Listening on port ${httpPort}!`)
 });
 
 app.get('/', function (req, res) {
-    res.sendFile(path.join(__dirname, 'public/index.html'))
+    res.sendFile(path.join(__dirname, 'public/index.html'));
 });
+
+let updateSubscriptions = () => {
+    const db = getDatabase();
+    var ref = databaseRef(db, "subscriptions/");
+    onValue(ref, (subs) => {
+        subs.forEach(function (sub) {
+            console.log(sub.val())
+            subscriptions.push(sub.val());
+        });
+    });
+}
 
 app.post("/addPicture", upload.single("image"), async (req, res) => {
     const file = req.file;
@@ -79,41 +95,33 @@ app.post("/addPicture", upload.single("image"), async (req, res) => {
 
 app.get("/snaps", async (req, res) => {
     const listRef = ref(storage);
-    let productPictures = [];
+    let snaps = [];
     await listAll(listRef)
         .then((pics) => {
-            productPictures = pics.items.map((item) => {
+            snaps = pics.items.map((item) => {
                 const publicUrl = `https://firebasestorage.googleapis.com/v0/b/${item._location.bucket}/o/${item._location.path_}?alt=media`;
                 return {
                     url: publicUrl,
                     name: item._location.path_,
                 };
             });
-            res.send(productPictures);
+            res.send(snaps);
         })
-        .catch((error) => {
-            console.log(error);
+        .catch((err) => {
             res.json({
                 success: false,
                 error: {
-                    message: 'Download failed. Check error message in console.'
+                    message: 'Download failed. Probably internet connection invalid.'
                 }
             });
         });
 });
 
-app.get("/snaps", function (req, res) {
-    let files = fse.readdirSync(uploadPath);
-    files = files.reverse().slice(0, 10);
-    res.json({
-        files
-    });
-});
-
 app.post('/subscriptions', (req, res) => {
     let sub = req.body.sub;
-    subscriptions.push(sub);
-    fs.writeFileSync(subscription, JSON.stringify(subscriptions));
+    const db = getDatabase();
+    var ref = "subscriptions/" + uuidv4();
+    set(databaseRef(db, ref), sub);
     res.status(200).json({
         success: true
     });
