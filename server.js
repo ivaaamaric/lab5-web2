@@ -50,7 +50,6 @@ let updateSubscriptions = () => {
     var ref = databaseRef(db, "subscriptions/");
     onValue(ref, (subs) => {
         subs.forEach(function (sub) {
-            console.log(sub.val())
             subscriptions.push(sub.val());
         });
     });
