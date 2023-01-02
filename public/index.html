@@ -60,6 +60,7 @@
     </div>
     <div id="images">
         <h3>Let's see all new posts:</h3>
+        <h5 id="error"></h5>
         <template id="template">
             <img class="img-fluid" src="tbd" />
         </template>
@@ -73,19 +74,22 @@
         fetch("/snaps")
             .then((res) => {
                 if (res.ok) {
-                    res.json().then((data) => {
-                        data.slice().reverse().forEach((file) => {
-                            let snapsDiv = document.querySelector("#images");
-                            let template = document.querySelector("#template");
-                            var clone = template.content.cloneNode(true);
-                            let img = clone.querySelector("img");
-                            img.alt = file.name
-                            img.src = file.url;
-                            snapsDiv.appendChild(clone);
+                    res.json()
+                        .then((data) => {
+                            data.slice().reverse().forEach((file) => {
+                                let snapsDiv = document.querySelector("#images");
+                                let template = document.querySelector("#template");
+                                var clone = template.content.cloneNode(true);
+                                let img = clone.querySelector("img");
+                                img.alt = file.name
+                                img.src = file.url;
+                                snapsDiv.appendChild(clone);
+                            });
+                        })
+                        .catch(e => {
+                            let errorMsg = document.querySelector("#error");
+                            errorMsg.innerHTML = res.statusText
                         });
-                    });
-                } else {
-                    console.log(res);
                 }
             })
             .catch((err) => {

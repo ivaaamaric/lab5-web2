@@ -34,7 +34,7 @@ self.addEventListener('fetch', function (event) {
                         if (res) {
                             return res
                         } else {
-                            return new Response("Not in cache", { "status": 408, "headers": { "Content-Type": "text/plain" } });
+                            return new Response("Not in cache", { "status": 200, "headers": { "Content-Type": "text/plain" }, "statusText": "This is unavailable when offline." });
                         }
                     });
             })
